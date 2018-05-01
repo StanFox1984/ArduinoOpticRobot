@@ -533,10 +533,10 @@ void make_decision(unsigned long *sensor_values, int num_sensors)
         current_direction = 0;
         n = get_best_light_sector(_sensorValue, 360/NUM_DIRS, NUM_SENSORS);
         last_check = millis();
-        if(n == 1) desired_direction = 0;
-        else desired_direction = 1;
-
-	add_command(LEFT90);
+	if (n != 1)
+	    add_command(LEFT90);
+	else
+	    add_command(FORWARD);
 	
         if(current_direction != desired_direction)
         {
@@ -649,59 +649,8 @@ void loop() {
     }
     else
     {
-        if(current_direction != desired_direction)
-        {
-          unsigned int cur_light0 = analogRead(A1)+analogRead(A2);
-          if((abs(cur_light0 - max_light) < 50) ||(cur_light0 > max_light))
-          {
-            current_direction = desired_direction;
-            max_light = cur_light0;
-          }
-          else
-          {
-          current_direction = (current_direction + 1) % NUM_DIRS;
-          Serial.write((String("Current direction ")+String(current_direction)).c_str());
-          Serial.write(String("\n").c_str());
-          unsigned int cur_light0 = analogRead(A0);
-          Serial.write((String("Turning, current light - ")+String(cur_light0)).c_str());
-          Serial.write(String("\n").c_str());
-          Serial.write((String("Desired direction ")+String(desired_direction)).c_str());
-          Serial.write(String("\n").c_str());
-          Serial.write((String("Desired light ")+String(max_light)).c_str());
-          Serial.write(String("\n").c_str());
-          do_program();
-
-          self_state = SCAN_STATE;
-          }
-        }
-        else
-        {
-          if(self_state == TURN_STATE)
-          {
-            o2 = 0;
-            current_direction = desired_direction = 0;
-            unsigned int cur_light0 = analogRead(A1)+analogRead(A2);
-            Serial.write((String("Target achieved, current light - ")+String(cur_light0)).c_str());
-            Serial.write(String("\n").c_str());
-            Serial.write((String("Desired light was ")+String(max_light)).c_str());
-            Serial.write(String("\n").c_str());
-            self_state = WAIT_STATE;
-            Serial.write("WAIT_STATE");
-            do_program();
-            Serial.write("\n");
-          }
-          else
-          {
-            if(self_state == WAIT_STATE)
-            {
-              self_state = SCAN_STATE;
-              Serial.write("SCAN_STATE");
-              Serial.write("\n");
-              Forward();
-              write_event(FORWARD, max_light);
-            }
-          }
-        }
+        do_program(_sensorValue, NUM_SENSORS);
+        self_state = SCAN_STATE;
     }
   }
   if(String(cmd) == "RightMotorOff")
