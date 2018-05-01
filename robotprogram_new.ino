@@ -1,23 +1,3 @@
-/*
-  Arduino Starter Kit example
- Project 6  - Light Theremin
- 
- This sketch is written to accompany Project 6 in the
- Arduino Starter Kit
- 
- Parts required:
- photoresistor
- 10 kilohm resistor 
- piezo
- 
- Created 13 September 2012
- by Scott Fitzgerald
- 
- http://arduino.cc/starterKit
- 
- This example code is part of the public domain 
-*/
-
 #include <EEPROM.h>
 
 #define NUM_DIRS 4
